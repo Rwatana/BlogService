@@ -1,3 +1,2 @@
 # BlogService
 
-test
