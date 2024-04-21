@@ -5,7 +5,10 @@ docker pull mysql
 docker run -it --name test-world-mysql -e MYSQL_ROOT_PASSWORD=mysql -d mysql:latest
 
 # MySQLのコンテナにログインする
-docker exec -it test-world-mysql mysql -u root -p
+docker exec -it test-wolrd-mysql bash -p
+
+# MySQLのコンテナにログインする
+mysql -u root -p -h 127.0.0.1
 
 # パスワードを入力後、MySQLのシェルが起動する
 
