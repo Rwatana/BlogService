@@ -1,7 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const axios = require("axios");
-
+const dbcn = require('../log/dbConnect');
+const { insertLog } = require('../log/dbSendLog');
 const app = express();
 app.use(bodyParser.json());
 
