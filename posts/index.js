@@ -10,6 +10,10 @@ app.use(cors());
 
 const posts = {};
 
+const dbcn = require("../log/dbConnect");
+const { insertLog } = require("../log/dbSendLog");
+const service = 'posts';
+
 app.get("/posts", (req, res) => {
   res.send(posts);
 });

@@ -9,7 +9,7 @@ const con = mysql.createConnection({
     table: 'test_log'
 });
 
-// 接続
+// connect
 con.connect((err) => {
     if (err) throw err;
 
@@ -23,7 +23,7 @@ function sendLogToDB(API, error_message) {
         api: API,
         error: error_message
     };
-    // MySQLクエリを使ってデータを挿入
+    // insert log
     con.query('INSERT INTO test_log SET ?', data, (err, res) => {
         if (err) throw err;
         console.log('Inserted:', res.insertId);
@@ -33,7 +33,7 @@ function sendLogToDB(API, error_message) {
 
 sendLogToDB('example_api', 'example_error_message');
 
-// 切断
+// disconnect
 con.end((err) => {
     if (err) throw err;
 

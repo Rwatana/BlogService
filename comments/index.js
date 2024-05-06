@@ -4,13 +4,15 @@ const { randomBytes } = require("crypto");
 const cors = require("cors");
 const axios = require("axios");
 const mysql = require("mysql");
-const dbcn = require("../log/dbConnect");
-const { insertLog } = require("../log/dbSendLog");
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
 const commentsByPostId = {};
+
+const dbcn = require("../log/dbConnect");
+const { insertLog } = require("../log/dbSendLog");
+const service = 'comments';
 
 app.get("/posts/:id/comments", (req, res) => {
   res.send(commentsByPostId[req.params.id] || []);
@@ -47,10 +49,10 @@ app.post("/events", async (req, res) => {
   const { type, data } = req.body;
 
   if (type === "CommentModerated") {
-    insertLog(dbcn, current_date, req.body.type, 'demo');
+    insertLog(dbcn, current_date, service, 'demo');
+
     const { postId, id, status, content } = data;
     const comments = commentsByPostId[postId];
-
     const comment = comments.find((comment) => {
       return comment.id === id;
     });
@@ -71,5 +73,7 @@ app.post("/events", async (req, res) => {
 });
 
 app.listen(4001, () => {
+  current_date = new Date();
+  insertLog(dbcn, current_date, service, 'comments service is listerning on 4001')
   console.log("Listening on 4001");
 });
