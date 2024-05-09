@@ -6,7 +6,7 @@ const con = mysql.createConnection({
     user: 'root',
     password: 'lOjit212',
     database: 'test_db',
-    table: 'test_log'
+    table: 'test_log2'
 });
 
 // connect
@@ -16,22 +16,27 @@ con.connect((err) => {
     console.log('connected to mysql');
 });
 
-function sendLogToDB(API, error_message) {
+
+
+
+function sendLogToDB(current_service,source_service,API, error_message) {
     current_time = new Date();
-    data = {
+    const data = {
         date: current_time,
-        api: API,
-        error: error_message
-    };
+        current_service: current_service,
+        source_service: source_service,
+        type_of_request: API,
+        content: error_message
+      };
     // insert log
-    con.query('INSERT INTO test_log SET ?', data, (err, res) => {
+    con.query('INSERT INTO test_log2 SET ?', data, (err, res) => {
         if (err) throw err;
         console.log('Inserted:', res.insertId);
     });
 }
 
 
-sendLogToDB('example_api', 'example_error_message');
+sendLogToDB('event-bus', 'comments' ,'POST' ,'demo');
 
 // disconnect
 con.end((err) => {

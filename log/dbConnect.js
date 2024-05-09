@@ -6,7 +6,7 @@ const dbcn = mysql.createConnection({
     user: 'root',
     password: 'lOjit212',
     database: 'test_db',
-    table: 'test_log'
+    table: 'test_log2'
 });
 
 module.exports= dbcn;
