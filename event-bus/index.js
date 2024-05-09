@@ -9,7 +9,9 @@ const events = [];
 
 const dbcn = require("../log/dbConnect");
 const { insertLog } = require("../log/dbSendLog");
-const service = 'event-bus';
+const e = require("express");
+const current_service = 'event-bus';
+
 
 app.post("/events", (req, res) => {
   current_date = new Date();
@@ -18,21 +20,21 @@ app.post("/events", (req, res) => {
   events.push(event);
 
   axios.post("http://localhost:4000/events", event).catch((err) => {
-    insertLog(dbcn, current_date, service, 'demo');
+    insertLog(dbcn, current_date, current_service, source_service, API, err.message);
     console.log(err.message);
   });
   axios.post("http://localhost:4001/events", event).catch((err) => {
-    insertLog(dbcn, current_date, service, 'demo');
+    insertLog(dbcn, current_date, current_service, source_service, API, err.message);
 
     console.log(err.message);
   });
   axios.post("http://localhost:4002/events", event).catch((err) => {
-    insertLog(dbcn, current_date, service, 'demo');
+    insertLog(dbcn, current_date, current_service, source_service, API, err.message);
 
     console.log(err.message);
   });
   axios.post("http://localhost:4003/events", event).catch((err) => {
-    insertLog(dbcn, current_date, service, 'demo');
+    insertLog(dbcn, current_date, current_service, source_service, API, err.message);
 
     console.log(err.message);
   });
@@ -41,13 +43,13 @@ app.post("/events", (req, res) => {
 
 app.get("/events", (req, res) => {
   current_date = new Date();
-  insertLog(dbcn, current_date, service, 'demo');
+  insertLog(dbcn, current_date, current_service, source_service, API, 'demo');
   res.send(events);
 });
 
 app.listen(4005, () => {
   current_date = new Date();
-  insertLog(dbcn, current_date, service, 'event-bus service is listerning on 4005');
+  insertLog(dbcn, current_date, current_service, source_service, API, 'event-bus server is running on port 4005');
   console.log("Listening on 4005");
 
 });
