@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: comments
-          image: rwatana/comments
+          image: rwatana/comments:lastest
 ---
 apiVersion: v1
 kind: Service

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: rwatana/client
+          image: rwatana/client:lastest
 ---
 apiVersion: v1
 kind: Service

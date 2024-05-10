@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: posts
-          image: rwatana/posts
+          image: rwatana/posts:lastest
 ---
 apiVersion: v1
 kind: Service
