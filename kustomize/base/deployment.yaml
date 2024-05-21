@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-deployment
+spec:
+  replicas: 4
+  revisionHistoryLimit: 4
+  selector:
+    matchLabels:
+      app: rollouts-deployment
+  template:
+    metadata:
+      labels:
+        app: rollouts-deployment
+    spec:
+      containers:
+        - name: app-container
+          image: golang:latest
+          command: ["tail", "-f", "/dev/null"]
+        - name: postgres-container
+          image: postgres:latest
+          command: ["tail", "-f", "/dev/null"]
+  strategy:
+    blueGreen:
+      activeService: rollout-blue-green-svc-active
+      previewService: rollout-blue-green-svc-preview
+      autoPromotionEnabled: false
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-config
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/okuda-seminar/Twitter-Clone.git
+    targetRevision: main
+    path: kustomize/base
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
