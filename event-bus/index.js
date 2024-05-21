@@ -9,9 +9,9 @@ const events = [];
 
 const dbcn = require("../log/dbConnect");
 const { insertLog } = require("../log/dbSendLog");
-const e = require("express");
 const current_service = 'event-bus';
-
+const source_service = 'demo';
+const API = 'POST';
 
 app.post("/events", (req, res) => {
   current_date = new Date();
@@ -20,7 +20,8 @@ app.post("/events", (req, res) => {
   events.push(event);
 
   axios.post("http://localhost:4000/events", event).catch((err) => {
-    insertLog(dbcn, current_date, current_service, source_service, API, err.message);
+
+    insertLog(dbcn, current_date, current_service, "client", "POST", err.message);
     console.log(err.message);
   });
   axios.post("http://localhost:4001/events", event).catch((err) => {

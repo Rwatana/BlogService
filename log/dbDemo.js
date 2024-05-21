@@ -6,7 +6,7 @@ const con = mysql.createConnection({
     user: 'root',
     password: 'lOjit212',
     database: 'test_db',
-    table: 'test_log2'
+    table: 'test_log3'
 });
 
 // connect
@@ -22,6 +22,7 @@ con.connect((err) => {
 function sendLogToDB(current_service,source_service,API, error_message) {
     current_time = new Date();
     const data = {
+        log_level: 'EMERGE',
         date: current_time,
         current_service: current_service,
         source_service: source_service,
@@ -29,7 +30,7 @@ function sendLogToDB(current_service,source_service,API, error_message) {
         content: error_message
       };
     // insert log
-    con.query('INSERT INTO test_log2 SET ?', data, (err, res) => {
+    con.query('INSERT INTO test_log3 SET ?', data, (err, res) => {
         if (err) throw err;
         console.log('Inserted:', res.insertId);
     });

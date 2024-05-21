@@ -7,7 +7,8 @@ CREATE DATABASE IF NOT EXISTS test_db;
 USE test_db;
 
 -- テーブルを作成する
-CREATE TABLE IF NOT EXISTS `test_log2` (
+CREATE TABLE IF NOT EXISTS `test_log3` (
+  `log_level` VARCHAR(100) NOT NULL COMMENT "Log_Level",
   `date` TIMESTAMP NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT "Date",
   `current_service` VARCHAR(100) NOT NULL COMMENT "Current_API",
   `source_service` VARCHAR(100) NOT NULL COMMENT "Source_API",
