@@ -9,10 +9,6 @@ app.use(cors());
 
 const posts = {};
 
-const dbcn = require("../log/dbConnect");
-const { insertLog } = require("../log/dbSendLog");
-const service = 'query';
-
 const handleEvent = (type, data) => {
   if (type === "PostCreated") {
     const { id, title } = data;
@@ -40,16 +36,11 @@ const handleEvent = (type, data) => {
   }
 };
 
-
 app.get("/posts", (req, res) => {
-  current_date = new Date();
-  insertLog(dbcn, current_date, service, 'demo')
   res.send(posts);
 });
 
 app.post("/events", (req, res) => {
-  current_date = new Date();
-  insertLog(dbcn, current_date, service, 'demo');
   const { type, data } = req.body;
 
   handleEvent(type, data);
@@ -58,8 +49,6 @@ app.post("/events", (req, res) => {
 });
 
 app.listen(4002, async () => {
-  current_date = new Date();
-  insertLog(dbcn, current_date, service, 'query service is listerning on 4002');
   console.log("Listening on 4002");
   try {
     const res = await axios.get("http://event-bus-srv:4005/events");
