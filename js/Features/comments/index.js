@@ -3,16 +3,12 @@ const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
 const cors = require("cors");
 const axios = require("axios");
-const mysql = require("mysql");
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
 const commentsByPostId = {};
-
-const dbcn = require("../log/dbConnect");
-const { insertLog } = require("../log/dbSendLog");
-const service = 'comments';
 
 app.get("/posts/:id/comments", (req, res) => {
   res.send(commentsByPostId[req.params.id] || []);
@@ -28,7 +24,7 @@ app.post("/posts/:id/comments", async (req, res) => {
 
   commentsByPostId[req.params.id] = comments;
 
-  await axios.post("http://localhost:4005/events", {
+  await axios.post("http://event-bus-srv:4005/events", {
     type: "CommentCreated",
     data: {
       id: commentId,
@@ -42,23 +38,20 @@ app.post("/posts/:id/comments", async (req, res) => {
 });
 
 app.post("/events", async (req, res) => {
-  current_date = new Date();
-
   console.log("Event Received:", req.body.type);
 
   const { type, data } = req.body;
 
   if (type === "CommentModerated") {
-    insertLog(dbcn, current_date, service, 'demo');
-
     const { postId, id, status, content } = data;
     const comments = commentsByPostId[postId];
+
     const comment = comments.find((comment) => {
       return comment.id === id;
     });
     comment.status = status;
 
-    await axios.post("http://localhost:4005/events", {
+    await axios.post("http://event-bus-srv:4005/events", {
       type: "CommentUpdated",
       data: {
         id,
@@ -73,7 +66,5 @@ app.post("/events", async (req, res) => {
 });
 
 app.listen(4001, () => {
-  current_date = new Date();
-  insertLog(dbcn, current_date, service, 'comments service is listerning on 4001')
   console.log("Listening on 4001");
 });
