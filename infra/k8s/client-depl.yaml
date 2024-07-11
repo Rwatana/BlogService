@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: rwatana/client:lastest
+          image: rwatana/client
 ---
 apiVersion: v1
 kind: Service
@@ -28,3 +28,20 @@ spec:
       protocol: TCP
       port: 3000
       targetPort: 3000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-srv
+spec:
+  type: NodePort
+  selector:
+    app: posts
+  ports:
+    - name: posts
+      protocol: TCP
+      port: 4000
+      targetPort: 4000
+

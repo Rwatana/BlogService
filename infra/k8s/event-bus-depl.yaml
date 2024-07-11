@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: event-bus
-          image: rwatana/event-bus:lastest
+          image: rwatana/event-bus:latest
 ---
 apiVersion: v1
 kind: Service

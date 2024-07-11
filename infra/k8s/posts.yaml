@@ -14,21 +14,7 @@ spec:
     spec:
       containers:
         - name: posts
-          image: rwatana/posts:lastest
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: posts-clusterip-srv
-spec:
-  selector:
-    app: posts
-  ports:
-    - name: posts
-      protocol: TCP
-      port: 4000
-      targetPort: 4000
-
+          image: rwatana/posts
 ---
 apiVersion: v1
 kind: Service
@@ -44,3 +30,16 @@ spec:
       port: 4000
       targetPort: 4000
 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-clusterip-srv
+spec:
+  selector:
+    app: posts
+  ports:
+    - name: posts
+      protocol: TCP
+      port: 4000
+      targetPort: 4000
