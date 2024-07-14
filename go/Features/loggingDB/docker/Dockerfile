@@ -1,10 +1,16 @@
-# MySQL 8.0をベースにする
-FROM mysql:latest
+FROM mysql:8.0
 
-# 環境変数を設定する（オプション）
-ENV MYSQL_ROOT_PASSWORD=mysql
+# set environment variables
+ENV MYSQL_ROOT_PASSWORD=root
+ENV MYSQL_DATABASE=logging
+ENV MYSQL_USER=user
+ENV MYSQL_PASSWORD=password
 
-# run create_db.sql file
-RUN souece create_db.sql
-# ポートを公開する（オプション）
-EXPOSE 3306
+# copy the database schema to the /docker-entrypoint-initdb.d directory
+COPY ./db/migrations /docker-entrypoint-initdb.d/
+
+# set the entrypoint script
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+# start the mysql server
+CMD ["mysqld"]

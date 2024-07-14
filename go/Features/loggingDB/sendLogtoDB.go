@@ -40,7 +40,7 @@ func sendResultToServer(url string, result map[string]string) error {
 }
 
 func main() {
-	resp, err := http.Get("http://localhost:8080/messages")
+	resp, err := http.Get("http://log-intermediate-srv:4006/messages")
 	if err != nil {
 		fmt.Printf("Error fetching data: %v\n", err)
 		return
@@ -88,7 +88,7 @@ func main() {
 		result["status"] = "error"
 		result["message"] = "Failed to insert some logs into the database."
 	}
-	err = sendResultToServer("http://localhost:8080/results", result)
+	err = sendResultToServer("http://log-intermediate-srv:4006/results", result)
 	if err != nil {
 		log.Fatalf("Failed to send result to server: %v", err)
 	}

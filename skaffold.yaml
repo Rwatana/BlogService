@@ -55,3 +55,18 @@ build:
         manual:
           - src: "*.js"
             dest: .
+    - image: rwatana/loggingdb
+      context: go/Features/loggingDB
+      docker:
+        dockerfile: docker/Dockerfile
+
+    - image: rwatana/logging-server
+      context: go/Features/loggingServer
+      docker:
+        dockerfile: docker/Dockerfile
+      sync:
+        manual:
+          - src: "**/*.go"
+            dest: .
+
+
