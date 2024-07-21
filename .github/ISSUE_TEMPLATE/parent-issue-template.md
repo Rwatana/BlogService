@@ -2,7 +2,7 @@
 name: Parent issue template
 about: parent issues
 title: ''
-labels: Parent
+labels: ''
 assignees: ''
 
 ---
