@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loggingdb
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loggingdb
+  template:
+    metadata:
+      labels:
+        app: loggingdb
+    spec:
+      containers:
+      - name: loggingdb
+        image: rwatana/loggingdb:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3306
+      volumes:
+      - name: loggingdb-volume
+        persistentVolumeClaim:
+          claimName: loggingdb-pv-claim
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loggingdb
+  namespace: default
+spec:
+  ports:
+  - port: 3306
+    targetPort: 3306
+  selector:
+    app: loggingdb

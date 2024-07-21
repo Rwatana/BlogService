@@ -115,7 +115,7 @@ func main() {
 
 	http.HandleFunc("/results", resultsHandler)
 
-	log.Println("Server started on :8080")
+	log.Println("Server started on :4006")
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":4006", nil))
 }
