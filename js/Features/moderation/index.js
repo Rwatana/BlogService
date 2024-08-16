@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const sendJsonData = require('./sendServer/sendRequest');
 
 const app = express();
 app.use(bodyParser.json());
@@ -21,6 +22,7 @@ app.post('/events', async (req, res) => {
       }
     });
   }
+  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'query', source_service: 'event-bus', type_of_request: 'GET', content: 'demo' });
 
   res.send({});
 });

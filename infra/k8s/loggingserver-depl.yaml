@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loggingserver-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loggingserver
+  template:
+    metadata:
+      labels:
+        app: loggingserver
+    spec:
+      containers:
+        - name: loggingserver
+          image: rwatana/loggingserver
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: loggingserver-srv
+spec:
+  selector:
+    app: loggingserver
+  ports:
+    - name: loggingserver
+      protocol: TCP
+      port: 4007
+      targetPort: 4007

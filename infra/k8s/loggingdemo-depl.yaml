@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loggingdemo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loggingdemo
+  template:
+    metadata:
+      labels:
+        app: loggingdemo
+    spec:
+      containers:
+        - name: loggingdemo
+          image: rwatana/loggingdemo
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: loggingdemo-srv
+spec:
+  selector:
+    app: loggingdemo
+  ports:
+    - name: loggingdemo
+      protocol: TCP
+      port: 4008
+      targetPort: 4008

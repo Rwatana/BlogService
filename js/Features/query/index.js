@@ -2,6 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const axios = require("axios");
+const sendJsonData = require('./sendServer/sendRequest');
+
 
 const app = express();
 app.use(bodyParser.json());
@@ -52,6 +54,7 @@ app.listen(4002, async () => {
   console.log("Listening on 4002");
   try {
     const res = await axios.get("http://event-bus-srv:4005/events");
+    sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'query', source_service: 'event-bus', type_of_request: 'GET', content: 'demo' });
 
     for (let event of res.data) {
       console.log("Processing event:", event.type);

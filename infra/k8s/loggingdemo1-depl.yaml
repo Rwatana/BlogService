@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loggingdemojs-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loggingdemojs
+  template:
+    metadata:
+      labels:
+        app: loggingdemojs
+    spec:
+      containers:
+        - name: loggingdemojs
+          image: rwatana/loggingdemojs
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: loggingdemojs-srv
+spec:
+  selector:
+    app: loggingdemojs
+  ports:
+    - name: loggingdemojs
+      protocol: TCP
+      port: 4009
+      targetPort: 4009

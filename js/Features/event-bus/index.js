@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const axios = require("axios");
-
+const sendJsonData = require('./sendServer/sendRequest');
 const app = express();
 app.use(bodyParser.json());
 
@@ -15,15 +15,20 @@ app.post("/events", (req, res) => {
   axios.post("http://posts-clusterip-srv:4000/events", event).catch((err) => {
     console.log(err.message);
   });
+  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'query', source_service: 'event-bus', type_of_request: 'GET', content: 'demo' });
+
   axios.post("http://comments-srv:4001/events", event).catch((err) => {
     console.log(err.message);
   });
+  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'query', source_service: 'event-bus', type_of_request: 'GET', content: 'demo' });
   axios.post("http://query-srv:4002/events", event).catch((err) => {
     console.log(err.message);
   });
+  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'query', source_service: 'event-bus', type_of_request: 'GET', content: 'demo' });
   axios.post("http://moderation-srv:4003/events", event).catch((err) => {
     console.log(err.message);
   });
+  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'query', source_service: 'event-bus', type_of_request: 'GET', content: 'demo' });
   res.send({ status: "OK" });
 });
 
