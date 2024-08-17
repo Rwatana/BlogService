@@ -136,6 +136,8 @@ func processLogs() {
             success = false
             break
         }
+		// remove message from store
+		messageStore = messageStore[1:]
     }
 
     if success {
@@ -147,10 +149,10 @@ func processLogs() {
         result["message"] = "Failed to insert some logs into the database."
     }
 
-    err = sendResultToServer("http://loggingdb-srv:4007/results", result)
-    if err != nil {
-        log.Fatalf("Failed to send result to server: %v", err)
-    }
+    // err = sendResultToServer("http://loggingdb-srv:4007/results", result)
+    // if err != nil {
+    //     log.Fatalf("Failed to send result to server: %v", err)
+    // }
 
     fmt.Println("Result sent to server successfully.")
 }

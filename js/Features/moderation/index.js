@@ -22,7 +22,7 @@ app.post('/events', async (req, res) => {
       }
     });
   }
-  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'query', source_service: 'event-bus', type_of_request: 'GET', content: 'demo' });
+  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'moderation', source_service: 'event-bus', type_of_request: 'POST', content: 'Send results to evnet-bus' });
 
   res.send({});
 });

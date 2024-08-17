@@ -32,7 +32,7 @@ app.post('/posts/create', async (req, res) => {
     },
   
   });
-  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'query', source_service: 'event-bus', type_of_request: 'GET', content: 'demo' });
+  sendJsonData({ log_level: 'NORMAL', date: new Date().toISOString(), current_service: 'posts', source_service: 'event-bus', type_of_request: 'POST', content: 'Do post request' });
   res.status(201).send(posts[id]);
 });
 
