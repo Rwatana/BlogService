@@ -45,9 +45,9 @@ func addData(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Received Message: %+v\n", msg)
 
-		// mu.Lock()
+		mu.Lock()
 		messageStore = append(messageStore, msg)
-		// mu.Unlock()
+		mu.Unlock()
 
 		fmt.Fprintf(w, "Received: %+v\n", msg)
 	} else {
@@ -57,9 +57,9 @@ func addData(w http.ResponseWriter, r *http.Request) {
 
 func getMessages(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		// mu.Lock()
+		mu.Lock()
 		messages := messageStore
-		// mu.Unlock()
+		mu.Unlock()
 
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(messages); err != nil {
@@ -95,9 +95,9 @@ func resultsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if status == "success" {
-			// mu.Lock()
+			mu.Lock()
 			messageStore = nil
-			// mu.Unlock()
+			mu.Unlock()
 			log.Println("Messages cleared successfully.")
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("Messages cleared successfully."))
@@ -112,8 +112,8 @@ func resultsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func processLogs() {
-    // mu.Lock()
-    // defer mu.Unlock()
+    mu.Lock()
+    defer mu.Unlock()
 
     if len(messageStore) == 0 {
         log.Println("No messages to process.")
