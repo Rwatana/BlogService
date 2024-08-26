@@ -1,6 +1,8 @@
 # BlogService
 # Logging service
-[Design Doc](https://docs.google.com/document/d/1k_qQ4C-U1Z3PNAMEj68xz_yHUYV07Vw3gluTen_-jlc/edit?usp=sharing)## Description
+[Design Doc](https://docs.google.com/document/d/1k_qQ4C-U1Z3PNAMEj68xz_yHUYV07Vw3gluTen_-jlc/edit?usp=sharing)
+
+## Description
 This is a simple blog services using node.js.
 It supports the following features.
 * Post creation
