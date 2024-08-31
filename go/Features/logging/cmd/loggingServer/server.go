@@ -1,9 +1,6 @@
 package main
 
 import (
-    "example.com/m/db"
-    "example.com/m/logger"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,6 +8,10 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"example.com/m/db"
+	"example.com/m/logger"
+	"github.com/streadway/amqp"
 )
 
 type Message struct {
@@ -22,6 +23,8 @@ type Message struct {
 	Content        string    `json:"content"`
 }
 
+// TODO https://github.com/Rwatana/BlogService/issues/21
+// - [Log] Unlock the Message Store and Send to the Database Promptly
 var (
 	messageStore []Message
 	mu           sync.Mutex
@@ -112,68 +115,99 @@ func resultsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func processLogs() {
-    mu.Lock()
-    defer mu.Unlock()
+	mu.Lock()
+	defer mu.Unlock()
 
-    if len(messageStore) == 0 {
-        log.Println("No messages to process.")
-        return
-    }
+	if len(messageStore) == 0 {
+		log.Println("No messages to process.")
+		return
+	}
 
-    dbConn, err := db.ConnectToDB()
-    if err != nil {
-        log.Fatalf("Could not connect to the database: %v", err)
-    }
-    defer dbConn.Close()
+	dbConn, err := db.ConnectToDB()
+	if err != nil {
+		log.Fatalf("Could not connect to the database: %v", err)
+	}
+	defer dbConn.Close()
 
-    result := make(map[string]string)
-    success := true
+	result := make(map[string]string)
+	success := true
 
-    for _, msg := range messageStore {
-        err = logger.SendLogToDB(dbConn, msg.LogLevel, msg.CurrentService, msg.SourceService, msg.TypeOfRequest, msg.Content)
-        if err != nil {
-            log.Printf("Failed to insert log: %v", err)
-            success = false
-            break
-        }
+	for _, msg := range messageStore {
+		err = logger.SendLogToDB(dbConn, msg.LogLevel, msg.CurrentService, msg.SourceService, msg.TypeOfRequest, msg.Content)
+		if err != nil {
+			log.Printf("Failed to insert log: %v", err)
+			success = false
+			break
+		}
 		// remove message from store
 		messageStore = messageStore[1:]
-    }
+	}
 
-    if success {
-        result["status"] = "success"
-        result["message"] = "All logs inserted successfully."
-        messageStore = []Message{} // メッセージストアを空にするが、nilにはしない
-    } else {
-        result["status"] = "error"
-        result["message"] = "Failed to insert some logs into the database."
-    }
+	if success {
+		result["status"] = "success"
+		result["message"] = "All logs inserted successfully."
+		messageStore = []Message{}
+	} else {
+		result["status"] = "error"
+		result["message"] = "Failed to insert some logs into the database."
+	}
 
-    // err = sendResultToServer("http://loggingdb-srv:4007/results", result)
-    // if err != nil {
-    //     log.Fatalf("Failed to send result to server: %v", err)
-    // }
-
-    fmt.Println("Result sent to server successfully.")
+	fmt.Println("Result sent to server successfully.")
 }
 
 
-func sendResultToServer(url string, result map[string]string) error {
-	jsonData, err := json.Marshal(result)
+func consumeMessages() {
+	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
-		return fmt.Errorf("error marshaling data: %w", err)
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		return fmt.Errorf("error sending POST request: %w", err)
-	}
-	defer resp.Body.Close()
+	defer conn.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		body, _ := ioutil.ReadAll(resp.Body)
-		return fmt.Errorf("received non-OK HTTP status: %s, body: %s", resp.Status, body)
+	ch, err := conn.Channel()
+	if err != nil {
+		log.Fatalf("Failed to open a channel: %v", err)
 	}
-	return nil
+	defer ch.Close()
+
+	q, err := ch.QueueDeclare(
+		"logs", // name
+		true,   // durable
+		false,  // delete when unused
+		false,  // exclusive
+		false,  // no-wait
+		nil,    // arguments
+	)
+	if err != nil {
+		log.Fatalf("Failed to declare a queue: %v", err)
+	}
+
+	msgs, err := ch.Consume(
+		q.Name, // queue
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	if err != nil {
+		log.Fatalf("Failed to register a consumer: %v", err)
+	}
+
+	for msg := range msgs {
+		var logData Message
+		err := json.Unmarshal(msg.Body, &logData)
+		if err != nil {
+			log.Printf("Failed to unmarshal message: %v", err)
+			continue
+		}
+
+		log.Printf("Received log from RabbitMQ: %+v", logData)
+
+		mu.Lock()
+		messageStore = append(messageStore, logData)
+		mu.Unlock()
+	}
 }
 
 func main() {
@@ -186,6 +220,12 @@ func main() {
 		log.Println("Server started on :4007")
 		log.Fatal(http.ListenAndServe(":4007", nil))
 	}()
+
+	// Start RabbitMQ consumer
+
+	// TODO https://github.com/Rwatana/BlogService/issues/20
+	// - [Log] Test rabbit mq that send control log traffic
+	go consumeMessages()
 
 	// Start a ticker to process logs every 10 seconds
 	ticker := time.NewTicker(10 * time.Second)
