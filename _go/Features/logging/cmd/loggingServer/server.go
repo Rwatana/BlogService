@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
@@ -14,49 +13,12 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type Message struct {
-	LogLevel       string    `json:"log_level"`
-	Date           time.Time `json:"date"`
-	CurrentService string    `json:"current_service"`
-	SourceService  string    `json:"source_service"`
-	TypeOfRequest  string    `json:"type_of_request"`
-	Content        string    `json:"content"`
-}
-
 // TODO https://github.com/Rwatana/BlogService/issues/21
 // - [Log] Unlock the Message Store and Send to the Database Promptly
 var (
 	messageStore []Message
 	mu           sync.Mutex
 )
-
-func addData(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		var msg Message
-
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		err = json.Unmarshal(body, &msg)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		log.Printf("Received Message: %+v\n", msg)
-
-		mu.Lock()
-		messageStore = append(messageStore, msg)
-		mu.Unlock()
-
-		fmt.Fprintf(w, "Received: %+v\n", msg)
-	} else {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-	}
-}
 
 func getMessages(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -155,7 +117,6 @@ func processLogs() {
 	fmt.Println("Result sent to server successfully.")
 }
 
-
 func consumeMessages() {
 	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
@@ -212,8 +173,9 @@ func consumeMessages() {
 
 func main() {
 	// Start the server to handle requests
+	h := NewLogHandler()
 	go func() {
-		http.HandleFunc("/data", addData)
+		http.HandleFunc("/data", h.InsertLogMessage)
 		http.HandleFunc("/messages", getMessages)
 		http.HandleFunc("/results", resultsHandler)
 
